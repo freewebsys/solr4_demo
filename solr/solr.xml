@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- http://wiki.apache.org/solr/CoreAdmin -->
+<solr persistent="true">
+	<!-- by default, this is 50 @ WARN <logging enabled="true"> <watcher size="100" 
+		threshold="INFO" /> </logging> -->
+
+	<!-- http://wiki.apache.org/solr/SolrCloud -->
+	<cores adminPath="/admin/cores" defaultCoreName="shop" host="${host:}"
+		hostPort="${jetty.port:}" hostContext="${hostContext:}"
+		zkClientTimeout="${zkClientTimeout:15000}">
+
+		<core name="shop" instanceDir="shop" />
+	</cores>
+</solr>
