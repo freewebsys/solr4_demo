@@ -1,7 +1,7 @@
 
 #macro(param $key)$request.params.get($key)#end
 
-#macro(url_root)/#end
+#macro(url_root)#end
 
 ## TODO: s/url_for_solr/url_for_core/ and s/url_root/url_for_solr/
 #macro(core_name)$request.core.name#end

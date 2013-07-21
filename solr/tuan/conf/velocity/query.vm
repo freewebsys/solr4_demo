@@ -3,8 +3,6 @@
     <div class="inputs">
       <span #annTitle("Add the query using the &q= parameter")>Find: <input type="text" id="q" name="q" value="$!esc.html($params.get('q'))"/> <input type="submit" id="querySubmit"/> <input type="reset"/></span>
       <div class="query-boost"><span #annTitle("Add the boost function &bf=price to the query")><input type="checkbox" name="bf" value="price" #if($request.params.get('bf') == 'price')checked="true"#end>Boost by Price</input></span>
-      #parse("querySpatial.vm")
-      #parse("queryGroup.vm")
       </div>
   </div>
 

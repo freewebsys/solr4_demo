@@ -6,71 +6,29 @@
 
 		<field name="id" type="string" indexed="true" stored="true"
 			required="true" multiValued="false" />
-		<field name="sku" type="string" indexed="true" stored="true"
-			omitNorms="true" />
-		<field name="name" type="text_general" indexed="true" stored="true" />
-		<field name="manu" type="text_general" indexed="true" stored="true"
-			omitNorms="true" />
-		<field name="cat" type="string" indexed="true" stored="true"
-			multiValued="true" />
-		<field name="features" type="text_general" indexed="true"
-			stored="true" multiValued="true" />
-		<field name="includes" type="text_general" indexed="true"
-			stored="true" termVectors="true" termPositions="true" termOffsets="true" />
+		<field name="title" type="text_general" indexed="true" stored="true" />
 
-		<field name="weight" type="float" indexed="true" stored="true" />
-		<field name="price" type="float" indexed="true" stored="true" />
-		<field name="popularity" type="int" indexed="true" stored="true" />
-		<field name="inStock" type="boolean" indexed="true" stored="true" />
 
-		<field name="store" type="string" indexed="true" stored="true" />
+		<field name="image" type="string" indexed="false" stored="true" />
+		<field name="value" type="double" indexed="false" stored="true" />
 
-		<field name="title" type="text_general" indexed="true" stored="true"
-			multiValued="true" />
-		<field name="subject" type="text_general" indexed="true" stored="true" />
-		<field name="description" type="text_general" indexed="true"
-			stored="true" />
-		<field name="comments" type="text_general" indexed="true"
-			stored="true" />
-		<field name="author" type="text_general" indexed="true" stored="true" />
-		<field name="author_s" type="text_general" indexed="true"
-			stored="true" />
-		<field name="keywords" type="text_general" indexed="true"
-			stored="true" />
-		<field name="category" type="text_general" indexed="true"
-			stored="true" />
-		<field name="resourcename" type="text_general" indexed="true"
-			stored="true" />
-		<field name="url" type="text_general" indexed="true" stored="true" />
-		<field name="content_type" type="string" indexed="true" stored="true"
-			multiValued="true" />
-		<field name="last_modified" type="date" indexed="true" stored="true" />
-		<field name="links" type="string" indexed="true" stored="true"
-			multiValued="true" />
+		<field name="price" type="double" indexed="true" stored="true" />
+		<field name="rebate" type="double" indexed="true" stored="true" />
 
-		<!-- Main body of document extracted by SolrCell. NOTE: This field is not 
-			indexed by default, since it is also copied to "text" using copyField below. 
-			This is to save space. Use this field for returning and highlighting document 
-			content. Use the "text" field to search the content. -->
-		<field name="content" type="text_general" indexed="false"
-			stored="true" multiValued="true" />
+		<field name="bought" type="long" indexed="true" stored="true" />
+
+		<field name="city" type="string" indexed="true" stored="true" />
+		<field name="loc" type="string" indexed="true" stored="true" />
+
+
+		<field name="startTime" type="date" indexed="true" stored="true" />
+		<field name="endTime" type="date" indexed="true" stored="true" />
 
 
 		<!-- catchall field, containing all other searchable text fields (implemented 
 			via copyField further on in this schema -->
 		<field name="text" type="text_general" indexed="true" stored="false"
 			multiValued="true" />
-
-		<!-- catchall text field that indexes tokens both normally and in reverse 
-			for efficient leading wildcard queries. -->
-		<field name="text_rev" type="string" indexed="true" stored="false"
-			multiValued="true" />
-
-		<!-- non-tokenized version of manufacturer to make it easier to sort or 
-			group results by manufacturer. copied from "manu" via copyField -->
-		<field name="manu_exact" type="string" indexed="true" stored="false" />
-
-		<field name="payloads" type="string" indexed="true" stored="true" />
 
 		<field name="_version_" type="long" indexed="true" stored="true" />
 
@@ -79,23 +37,7 @@
 
 	<uniqueKey>id</uniqueKey>
 
-
-	<copyField source="cat" dest="text" />
-	<copyField source="name" dest="text" />
-	<copyField source="manu" dest="text" />
-	<copyField source="features" dest="text" />
-	<copyField source="includes" dest="text" />
-	<copyField source="manu" dest="manu_exact" />
-
-
-	<!-- Text fields from SolrCell to search by default in our catch-all field -->
 	<copyField source="title" dest="text" />
-	<copyField source="author" dest="text" />
-	<copyField source="description" dest="text" />
-	<copyField source="keywords" dest="text" />
-	<copyField source="content" dest="text" />
-	<copyField source="content_type" dest="text" />
-	<copyField source="resourcename" dest="text" />
 
 	<types>
 

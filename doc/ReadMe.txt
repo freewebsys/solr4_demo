@@ -10,6 +10,18 @@
 jetty:run -Dmaven.test.skip=true 
 
 3,debug调试
-
+使用jetty 6.1.26版本，比较稳定.
 MAVEN_OPTS  
 -Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,address=4000,server=y,suspend=n
+
+4,下载编译，如果遇到maven编译问题。
+使用eclipse 4.3 
+
+Alt+F5
+更新maven依赖，并勾选，Force Update Of Snapshots/Releases
+
+5,数据抓取使用使用meituan的好123数据抓取地址：
+
+http://www.hao123.com/redian/api.htm
+http://www.meituan.com/api/deals/hao123
+全部数据比较大，demo只抓取部分数据。
