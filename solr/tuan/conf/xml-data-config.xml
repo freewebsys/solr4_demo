@@ -1,0 +1,53 @@
+<dataConfig>
+
+	<script><![CDATA[
+                function ReplaceLocAddId(row)    {
+                    var loc_1 = row.get('loc').split('/deal/');
+                    var loc_2 = loc_1[1].split('.html');
+                    var id = loc_2[0];
+                    row.put('id', id);
+                    //格式化时间.
+                    var sdf = new java.text.SimpleDateFormat('yyyy-MM-dd HH:mm:ss');
+                    //开始时间.
+                    row.put('startTime', com.demo.tuan.DateUtils.format(row.get('startTime')));
+                    //结束时间.
+                    row.put('endTime', com.demo.tuan.DateUtils.format(row.get('endTime')));
+                    //去掉折扣汉字.
+                    row.put('rebate', row.get('rebate').replace('折',''));
+                    
+                    return row;
+                }
+        ]]></script>
+	<dataSource type="FileDataSource" encoding="UTF-8" />
+	<document>
+		<entity name="tuan" pk="loc"
+			url="/data/workspace.freewebsys/solr4_demo/doc/meituan_hao123_demo.xml"
+			processor="XPathEntityProcessor" forEach="/urlset/url"
+			transformer="script:ReplaceLocAddId,DateFormatTransformer">
+
+			<field column="loc" xpath="/urlset/url/loc" commonField="true" />
+
+			<field column="city" xpath="/urlset/url/data/display/city"
+				commonField="true" />
+			<field column="title" xpath="/urlset/url/data/display/title"
+				commonField="true" />
+			<field column="image" xpath="/urlset/url/data/display/image"
+				commonField="true" />
+
+			<field column="value" xpath="/urlset/url/data/display/value"
+				commonField="true" />
+			<field column="price" xpath="/urlset/url/data/display/price"
+				commonField="true" />
+			<field column="rebate" xpath="/urlset/url/data/display/rebate"
+				commonField="true" />
+			<field column="bought" xpath="/urlset/url/data/display/bought"
+				commonField="true" />
+
+			<field column="startTime" xpath="/urlset/url/data/display/startTime"
+				dateTimeFormat="yyyy-MM-dd HH:mm:ss" commonField="true" />
+			<field column="endTime" xpath="/urlset/url/data/display/endTime"
+				dateTimeFormat="yyyy-MM-dd HH:mm:ss" commonField="true" />
+
+		</entity>
+	</document>
+</dataConfig>
