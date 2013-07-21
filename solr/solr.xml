@@ -9,6 +9,6 @@
 		hostPort="${jetty.port:}" hostContext="${hostContext:}"
 		zkClientTimeout="${zkClientTimeout:15000}">
 
-		<core name="shop" instanceDir="shop" />
+		<core name="tuan" instanceDir="tuan" />
 	</cores>
 </solr>
