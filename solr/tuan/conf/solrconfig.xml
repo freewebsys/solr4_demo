@@ -106,7 +106,7 @@
 			<str name="df">text</str>
 			<str name="mm">100%</str>
 			<str name="q.alt">*:*</str>
-			<str name="rows">20</str>
+			<str name="rows">32</str>
 			<str name="fl">*,score</str>
 
 

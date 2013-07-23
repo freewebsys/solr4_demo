@@ -2,7 +2,7 @@
 <li id="#field('id')">
 	<div class="p-img">
 		<a target="_blank" href="#field('loc')">
-		<img width="220" height="282" src="#field('image')">
+		<img width="220" height="150" src="#field('image')">
 		</a>
 	</div>
 	<div class="p-name">
