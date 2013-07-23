@@ -51,14 +51,14 @@
 #macro(link_to_previous_page $text)
   #if($page.current_page_number > 1)
     #set($prev_start = $page.start - $page.results_per_page)
-    <a class="prev-page" href="#url_for_start($prev_start)">$text</a>
+    <a class="prev" href="#url_for_start($prev_start)">$text</a>
   #end
 #end
 
 #macro(link_to_next_page $text)
   #if($page.current_page_number < $page.page_count)
     #set($next_start = $page.start + $page.results_per_page)
-    <a class="next-page" href="#url_for_start($next_start)">$text</a>
+    <a class="next" href="#url_for_start($next_start)">$text</a>
   #end
 #end
 
@@ -91,27 +91,36 @@
 
 
 #macro(display_facet_range $field, $display, $fieldName, $start, $end, $gap, $before, $after)
-  <span class="facet-field">$display</span>
-    <ul>
+  	<dl><dt>$display： <dt>
+  	<dd>
     #if($before && $before != "")
       #set($value = "[* TO " + "#format_value($start)" + "}")
       #set($facetURL = "#url_for_facet_range_filter($fieldName, $value)")
-      <li><a href="$facetURL">Less than #format_value($start)</a> ($before)</li>
+      
+      <div rel="0">
+		<a href="$facetURL">Less than #format_value($start)</a>($before)
+	  </div>
     #end
     #foreach ($facet in $field)
       #set($rangeEnd = "#range_get_to_value($facet.key, $gap)")
       #set($value = "[" + $facet.key + " TO " + $rangeEnd + "}")
       #set($facetURL = "#url_for_facet_range_filter($fieldName, $value)")
       #if ($facetURL != '')
-        <li><a href="$facetURL">$facet.key - #format_value($rangeEnd)</a> ($facet.value)</li>
+      
+      	<div rel="0">
+			<a href="$facetURL">$facet.key - #format_value($rangeEnd)</a>($facet.value)
+		</div>
       #end
     #end
     #if($end && $end != "" && $after > 0)
       #set($value = "[" + "#format_value($end)" + " TO *}")
       #set($facetURL = "#url_for_facet_range_filter($fieldName, $value)")
-      <li><a href="$facetURL">More than #format_value($end)</a> ($after)</li>
+      
+      <div rel="0">
+			<a href="$facetURL">More than #format_value($end)</a>($after)
+		</div>
     #end
-    </ul>
+    </dd></dl>
 #end
 
 ## $pivots is a list of facet_pivot

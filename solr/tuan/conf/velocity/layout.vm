@@ -1,13 +1,113 @@
-<html>
+<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  #parse("head.vm")
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>  
+<title>购物网站demo</title>
+<link rel="stylesheet" type="text/css" href="#{url_for_solr}/admin/file?file=/velocity/css/base.css&contentType=text/css" media="all"/>
+<link rel="stylesheet" type="text/css" href="#{url_for_solr}/admin/file?file=/velocity/css/plist20130604.css&contentType=text/css" media="all"/>
+
+<script type="text/javascript">
+function search(){
+	document.getElementById("search_form").submit();
+}
+</script>
+  
+
 </head>
-  <body>
-    <div id="content">
-      $content
+<body class="root61">
+
+<!--crumb end-->
+<div class="w main" style="width: 990px;">
+    
+    <div class="w" id="header-2013" style="margin-left: 20px;">
+    
+    	<div id="logo-2013" class="ld" style="width: 230px;">
+    		<a href="browse" hidefocus="true"><b></b>
+    		<img src="#{url_root}/img/solr.png" width="109" height="60"></a>
+    	</div>
+    	
+        <div id="search-2013">
+            <div class="i-search ld">
+                <ul id="shelper" class="hide">
+                </ul>
+                <div class="form">
+                	<form id="search_form" action="browse" method="get">
+                    <input type="text" name="q" style="height: 30px;" class="text" id="key" autocomplete="off" onkeydown="javascript:if(event.keyCode==13) search();">
+                    <input type="button" style="width:88px" value="搜索" class="button" onclick="javascript:search();">
+                    </form>
+                </div>
+            </div>
+            <div id="hotwords"><strong>热门搜索：</strong>
+				<a href="browse?q=连衣裙">连衣裙</a>
+				<a href="browse?q=手机">手机</a>
+				<a href="browse?q=电影">电影</a>
+			</div>
+        </div>
     </div>
-    <div id="footer">
-      #parse("footer.vm")
+        
+<div id="select" class="m">
+	<div class="mt">
+		<h1><strong>&nbsp;-&nbsp;商品筛选</strong></h1>
+	</div>
+
+
+#if($response.facetFields)
+	
+	    #foreach($field in $response.facetFields)
+	      ## Hide facets without value
+	      #if($field.values.size() > 0)
+	      	<dl>
+	    	<dt>$field.name： <dt>
+	    	<dd>
+	        #foreach($facet in $field.values)
+	        	<div rel="0">
+	        		<a href="#url_for_facet_filter($field.name, $facet.name)">$facet.name</a>($facet.count)
+	        	</div>
+	        #end
+	      	</dd></dl>
+	      #end
+	    #end
+#end
+
+#foreach ($field in $response.response.facet_counts.facet_ranges)
+  ## Hide facets without value
+  #if($field.value.counts.size() > 0)
+	#set($name = $field.key)
+	#set($display = $name)
+	#set($f = $field.value.counts)
+	#set($start = $field.value.start)
+	#set($end = $field.value.end)
+	#set($gap = $field.value.gap)
+	#set($before = $field.value.before)
+	#set($after = $field.value.after)
+	#display_facet_range($f, $display, $name, $start, $end, $gap, $before, $after)
+  #end
+#end
+
+
+</div><!--select end -->
+
+<div class="m clearfix">
+	<div class="pagin fr">
+		#link_to_previous_page("上一页")
+		<span class="text">$page.current_page_number/$page.page_count</span>
+		#link_to_next_page("下一页")
+	</div>
+</div>
+
+<div class="m plist-n7 plist-n8" id="plist">
+<ul class="list-h">
+ $content
+</ul>
+</div>
+
+<div class="m clearfix">
+	<div class="pagin fr">
+		#link_to_previous_page("上一页")
+		<span class="text">$page.current_page_number/$page.page_count</span>
+		#link_to_next_page("下一页")
+	</div>
+</div>
+
     </div>
-  </body>
-</html>
+    
+</body></html>

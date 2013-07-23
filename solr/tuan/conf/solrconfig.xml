@@ -94,26 +94,30 @@
 
 			<!-- VelocityResponseWriter settings -->
 			<str name="wt">velocity</str>
+			<str name="v.properties">velocity.properties</str>
+			<str name="v.contentType">text/html;charset=utf-8</str>
+			
 			<str name="v.template">browse</str>
 			<str name="v.layout">layout</str>
-			<str name="title">Solritas</str>
+			<str name="title">团购网站demo</str>
 
 			<!-- Query settings -->
 			<str name="defType">edismax</str>
 			<str name="df">text</str>
 			<str name="mm">100%</str>
 			<str name="q.alt">*:*</str>
-			<str name="rows">10</str>
+			<str name="rows">20</str>
 			<str name="fl">*,score</str>
 
 
 			<!-- Faceting defaults -->
 			<str name="facet">on</str>
 			<str name="facet.field">city</str>
+			<str name="facet.field">sort</str>
 			<str name="facet.range">price</str>
-			<int name="f.price.facet.range.start">0</int>
-			<int name="f.price.facet.range.end">600</int>
-			<int name="f.price.facet.range.gap">50</int>
+			<int name="f.price.facet.range.start">100</int>
+			<int name="f.price.facet.range.end">1500</int>
+			<int name="f.price.facet.range.gap">200</int>
 
 			<!-- Highlighting defaults -->
 			<str name="hl">on</str>

@@ -18,10 +18,10 @@
                     return row;
                 }
         ]]></script>
-	<dataSource type="FileDataSource" encoding="UTF-8" />
+	<dataSource type="FileDataSource" encoding="utf-8" />
 	<document>
 		<entity name="tuan" pk="loc"
-			url="/data/workspace.freewebsys/solr4_demo/doc/meituan_hao123_demo.xml"
+			url="/data/workspace.freewebsys/solr4_demo/doc/meituan_hao123.xml"
 			processor="XPathEntityProcessor" forEach="/urlset/url"
 			transformer="script:ReplaceLocAddId,DateFormatTransformer">
 
@@ -29,6 +29,9 @@
 
 			<field column="city" xpath="/urlset/url/data/display/city"
 				commonField="true" />
+			<field column="sort" xpath="/urlset/url/data/display/sort"
+				commonField="true" />
+				
 			<field column="title" xpath="/urlset/url/data/display/title"
 				commonField="true" />
 			<field column="image" xpath="/urlset/url/data/display/image"

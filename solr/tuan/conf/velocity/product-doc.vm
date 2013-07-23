@@ -1,9 +1,14 @@
-<div class="result-title"><b>#field('name')
 
-
-<div>Id: #field('id')</div>
-<div>price: #field('price')</div>
-<div>loc: #field('loc')</div>
-<div>In Stock: #field('inStock')</div>
-
-</div>
+<li id="#field('id')">
+	<div class="p-img">
+		<a target="_blank" href="#field('loc')">
+		<img width="220" height="282" src="#field('image')">
+		</a>
+	</div>
+	<div class="p-name">
+		<a target="_blank" href="#field('loc')">#field('title')</a>
+	</div>
+	<div id="djd1018888719" class="p-price">
+		<strong>￥#field('price')</strong>
+	</div>
+ </li>

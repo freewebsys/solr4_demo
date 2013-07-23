@@ -18,6 +18,8 @@
 		<field name="bought" type="long" indexed="true" stored="true" />
 
 		<field name="city" type="string" indexed="true" stored="true" />
+		<field name="sort" type="string" indexed="true" stored="true" />
+		
 		<field name="loc" type="string" indexed="true" stored="true" />
 
 
