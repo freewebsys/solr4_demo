@@ -4,8 +4,7 @@
       ## Hide facets without value
       #if($field.values.size() > 0)
       <span class="facet-field">$field.name</span>
-
-      <ul>
+      <ul style="list-style:none;">
         #foreach($facet in $field.values)
             <li><a href="#url_for_facet_filter($field.name, $facet.name)">$facet.name</a> ($facet.count)</li>
         #end

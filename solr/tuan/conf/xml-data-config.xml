@@ -1,6 +1,6 @@
 <dataConfig>
-
-	<script><![CDATA[
+	<script>
+        <![CDATA[
                 function ReplaceLocAddId(row)    {
                     var loc_1 = row.get('loc').split('/deal/');
                     var loc_2 = loc_1[1].split('.html');
@@ -14,14 +14,14 @@
                     row.put('endTime', com.demo.tuan.DateUtils.format(row.get('endTime')));
                     //去掉折扣汉字.
                     row.put('rebate', row.get('rebate').replace('折',''));
-                    
                     return row;
                 }
-        ]]></script>
+        ]]>
+    </script>
 	<dataSource type="FileDataSource" encoding="utf-8" />
 	<document>
 		<entity name="tuan" pk="loc"
-			url="/data/workspace.freewebsys/solr4_demo/doc/meituan_hao123.xml"
+			url="d:/var/data/meituan_hao123.xml"
 			processor="XPathEntityProcessor" forEach="/urlset/url"
 			transformer="script:ReplaceLocAddId,DateFormatTransformer">
 

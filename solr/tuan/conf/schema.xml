@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-
 <schema name="example" version="1.5">
 
 	<fields>
@@ -7,7 +6,6 @@
 		<field name="id" type="string" indexed="true" stored="true"
 			required="true" multiValued="false" />
 		<field name="title" type="text_general" indexed="true" stored="true" />
-
 
 		<field name="image" type="string" indexed="false" stored="true" />
 		<field name="value" type="double" indexed="false" stored="true" />
@@ -22,10 +20,8 @@
 		
 		<field name="loc" type="string" indexed="true" stored="true" />
 
-
 		<field name="startTime" type="date" indexed="true" stored="true" />
 		<field name="endTime" type="date" indexed="true" stored="true" />
-
 
 		<!-- catchall field, containing all other searchable text fields (implemented 
 			via copyField further on in this schema -->

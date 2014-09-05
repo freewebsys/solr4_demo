@@ -2,8 +2,8 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>  
 <title>购物网站demo</title>
-<link rel="stylesheet" type="text/css" href="#{url_for_solr}/admin/file?file=/velocity/css/base.css&contentType=text/css" media="all"/>
-<link rel="stylesheet" type="text/css" href="#{url_for_solr}/admin/file?file=/velocity/css/plist20130604.css&contentType=text/css" media="all"/>
+<link rel="stylesheet" type="text/css" href="#url_for_solr/admin/file?file=/velocity/css/base.css&contentType=text/css" media="all"/>
+<link rel="stylesheet" type="text/css" href="#url_for_solr/admin/file?file=/velocity/css/plist20130604.css&contentType=text/css" media="all"/>
 
 <script type="text/javascript">
 function search(){

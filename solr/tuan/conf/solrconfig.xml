@@ -1,492 +1,489 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <config>
+    <luceneMatchVersion>4.10.0</luceneMatchVersion>
 
-	<luceneMatchVersion>LUCENE_43</luceneMatchVersion>
-	<dataDir>${solr.data.dir:}</dataDir>
-	<directoryFactory name="DirectoryFactory"
-		class="${solr.directoryFactory:solr.NRTCachingDirectoryFactory}" />
-	<codecFactory class="solr.SchemaCodecFactory" />
-	<schemaFactory class="ClassicIndexSchemaFactory" />
-	<indexConfig>
-		<lockType>${solr.lock.type:native}</lockType>
-	</indexConfig>
-	<updateHandler class="solr.DirectUpdateHandler2">
-		<updateLog>
-			<str name="dir">${solr.ulog.dir:}</str>
-		</updateLog>
-		<autoCommit>
-			<maxTime>15000</maxTime>
-			<openSearcher>false</openSearcher>
-		</autoCommit>
-	</updateHandler>
-	<query>
-		<maxBooleanClauses>1024</maxBooleanClauses>
-		<filterCache class="solr.FastLRUCache" size="512"
-			initialSize="512" autowarmCount="0" />
-		<queryResultCache class="solr.LRUCache" size="512"
-			initialSize="512" autowarmCount="0" />
-		<documentCache class="solr.LRUCache" size="512"
-			initialSize="512" autowarmCount="0" />
-		<enableLazyFieldLoading>true</enableLazyFieldLoading>
-		<queryResultWindowSize>20</queryResultWindowSize>
-		<queryResultMaxDocsCached>200</queryResultMaxDocsCached>
-		<listener event="newSearcher" class="solr.QuerySenderListener">
-			<arr name="queries">
-			</arr>
-		</listener>
-		<listener event="firstSearcher" class="solr.QuerySenderListener">
-			<arr name="queries">
-				<lst>
-					<str name="q">static firstSearcher warming in solrconfig.xml</str>
-				</lst>
-			</arr>
-		</listener>
-		<useColdSearcher>false</useColdSearcher>
-		<maxWarmingSearchers>2</maxWarmingSearchers>
-	</query>
-	<requestDispatcher handleSelect="false">
-		<requestParsers enableRemoteStreaming="true"
-			multipartUploadLimitInKB="2048000" formdataUploadLimitInKB="2048" />
-		<httpCaching never304="true" />
-	</requestDispatcher>
+    <lib dir="../../../contrib/extraction/lib" regex=".*\.jar"/>
+    <lib dir="../../../dist/" regex="solr-cell-\d.*\.jar"/>
+
+    <lib dir="../../../contrib/clustering/lib/" regex=".*\.jar"/>
+    <lib dir="../../../dist/" regex="solr-clustering-\d.*\.jar"/>
+
+    <lib dir="../../../contrib/langid/lib/" regex=".*\.jar"/>
+    <lib dir="../../../dist/" regex="solr-langid-\d.*\.jar"/>
+
+    <lib dir="../../../contrib/velocity/lib" regex=".*\.jar"/>
+    <lib dir="../../../dist/" regex="solr-velocity-\d.*\.jar"/>
+
+    <dataDir>${solr.data.dir:}</dataDir>
+
+    <directoryFactory name="DirectoryFactory"
+                      class="${solr.directoryFactory:solr.NRTCachingDirectoryFactory}">
 
 
-	<requestHandler name="/dataimport"
-		class="org.apache.solr.handler.dataimport.DataImportHandler">
-		<lst name="defaults">
-			<str name="config">xml-data-config.xml</str>
-		</lst>
-	</requestHandler>
+        <str name="solr.hdfs.home">${solr.hdfs.home:}</str>
+        <!-- The hadoop configuration files to use for the hdfs client. -->
+        <str name="solr.hdfs.confdir">${solr.hdfs.confdir:}</str>
+        <!-- Enable/Disable the hdfs cache. -->
+        <str name="solr.hdfs.blockcache.enabled">${solr.hdfs.blockcache.enabled:true}</str>
+        <!-- Enable/Disable using one global cache for all SolrCores.
+             The settings used will be from the first HdfsDirectoryFactory created. -->
+        <str name="solr.hdfs.blockcache.global">${solr.hdfs.blockcache.global:true}</str>
+
+    </directoryFactory>
+
+    <codecFactory class="solr.SchemaCodecFactory"/>
+
+    <schemaFactory class="ClassicIndexSchemaFactory"/>
+
+    <indexConfig>
+
+        <lockType>${solr.lock.type:native}</lockType>
+
+        <infoStream>true</infoStream>
+
+        <checkIntegrityAtMerge>false</checkIntegrityAtMerge>
+    </indexConfig>
 
 
-	<requestHandler name="/select" class="solr.SearchHandler">
-		<!-- default values for query parameters can be specified, these will be 
-			overridden by parameters in the request -->
-		<lst name="defaults">
-			<str name="echoParams">explicit</str>
-			<int name="rows">10</int>
-			<str name="df">text</str>
-		</lst>
-	</requestHandler>
+    <jmx/>
+    <updateHandler class="solr.DirectUpdateHandler2">
+        <updateLog>
+            <str name="dir">${solr.ulog.dir:}</str>
+        </updateLog>
 
-	<!-- A request handler that returns indented JSON by default -->
-	<requestHandler name="/query" class="solr.SearchHandler">
-		<lst name="defaults">
-			<str name="echoParams">explicit</str>
-			<str name="wt">json</str>
-			<str name="indent">true</str>
-			<str name="df">text</str>
-		</lst>
-	</requestHandler>
+        <autoCommit>
+            <maxTime>${solr.autoCommit.maxTime:15000}</maxTime>
+            <openSearcher>false</openSearcher>
+        </autoCommit>
+
+        <autoSoftCommit>
+            <maxTime>${solr.autoSoftCommit.maxTime:-1}</maxTime>
+        </autoSoftCommit>
 
 
-	<requestHandler name="/get" class="solr.RealTimeGetHandler">
-		<lst name="defaults">
-			<str name="omitHeader">true</str>
-			<str name="wt">json</str>
-			<str name="indent">true</str>
-		</lst>
-	</requestHandler>
+    </updateHandler>
 
-	<requestHandler name="/browse" class="solr.SearchHandler">
-		<lst name="defaults">
-			<str name="echoParams">explicit</str>
-
-			<!-- VelocityResponseWriter settings -->
-			<str name="wt">velocity</str>
-			<str name="v.properties">velocity.properties</str>
-			<str name="v.contentType">text/html;charset=utf-8</str>
-			
-			<str name="v.template">browse</str>
-			<str name="v.layout">layout</str>
-			<str name="title">团购网站demo</str>
-
-			<!-- Query settings -->
-			<str name="defType">edismax</str>
-			<str name="df">text</str>
-			<str name="mm">100%</str>
-			<str name="q.alt">*:*</str>
-			<str name="rows">32</str>
-			<str name="fl">*,score</str>
+    <query>
+        <maxBooleanClauses>1024</maxBooleanClauses>
 
 
-			<!-- Faceting defaults -->
-			<str name="facet">on</str>
-			<str name="facet.field">city</str>
-			<str name="facet.field">sort</str>
-			<str name="facet.range">price</str>
-			<int name="f.price.facet.range.start">100</int>
-			<int name="f.price.facet.range.end">1500</int>
-			<int name="f.price.facet.range.gap">200</int>
+        <filterCache class="solr.FastLRUCache"
+                     size="512"
+                     initialSize="512"
+                     autowarmCount="0"/>
 
-			<!-- Highlighting defaults -->
-			<str name="hl">on</str>
-			<str name="hl.fl">title</str>
-			<str name="hl.encoder">html</str>
-			<str name="hl.simple.pre">&lt;font colr='red' &gt;</str>
-			<str name="hl.simple.post">&lt;/font&gt;</str>
-			<str name="f.title.hl.fragsize">0</str>
-			<str name="f.title.hl.alternateField">title</str>
+        <queryResultCache class="solr.LRUCache"
+                          size="512"
+                          initialSize="512"
+                          autowarmCount="0"/>
 
-			<!-- Spell checking defaults -->
-			<str name="spellcheck">on</str>
-			<str name="spellcheck.extendedResults">false</str>
-			<str name="spellcheck.count">5</str>
-			<str name="spellcheck.alternativeTermCount">2</str>
-			<str name="spellcheck.maxResultsForSuggest">5</str>
-			<str name="spellcheck.collate">true</str>
-			<str name="spellcheck.collateExtendedResults">true</str>
-			<str name="spellcheck.maxCollationTries">5</str>
-			<str name="spellcheck.maxCollations">3</str>
-		</lst>
+        <documentCache class="solr.LRUCache"
+                       size="512"
+                       initialSize="512"
+                       autowarmCount="0"/>
 
-		<!-- append spellchecking to our list of components -->
-		<arr name="last-components">
-			<str>spellcheck</str>
-		</arr>
-	</requestHandler>
+        <!-- custom cache currently used by block join -->
+        <cache name="perSegFilter"
+               class="solr.search.LRUCache"
+               size="10"
+               initialSize="0"
+               autowarmCount="10"
+               regenerator="solr.NoOpRegenerator"/>
 
+        <enableLazyFieldLoading>true</enableLazyFieldLoading>
 
-	<requestHandler name="/update" class="solr.UpdateRequestHandler">
-	</requestHandler>
+        <queryResultWindowSize>20</queryResultWindowSize>
 
-	<!-- for back compat with clients using /update/json and /update/csv -->
-	<requestHandler name="/update/json" class="solr.JsonUpdateRequestHandler">
-		<lst name="defaults">
-			<str name="stream.contentType">application/json</str>
-		</lst>
-	</requestHandler>
-	<requestHandler name="/update/csv" class="solr.CSVRequestHandler">
-		<lst name="defaults">
-			<str name="stream.contentType">application/csv</str>
-		</lst>
-	</requestHandler>
+        <queryResultMaxDocsCached>200</queryResultMaxDocsCached>
 
-	<!-- Solr Cell Update Request Handler http://wiki.apache.org/solr/ExtractingRequestHandler -->
-	<requestHandler name="/update/extract" startup="lazy"
-		class="solr.extraction.ExtractingRequestHandler">
-		<lst name="defaults">
-			<str name="lowernames">true</str>
-			<str name="uprefix">ignored_</str>
+        <listener event="newSearcher" class="solr.QuerySenderListener">
+            <arr name="queries">
+            </arr>
+        </listener>
+        <listener event="firstSearcher" class="solr.QuerySenderListener">
+            <arr name="queries">
+                <lst>
+                    <str name="q">static firstSearcher warming in solrconfig.xml</str>
+                </lst>
+            </arr>
+        </listener>
 
-			<!-- capture link hrefs but ignore div attributes -->
-			<str name="captureAttr">true</str>
-			<str name="fmap.a">links</str>
-			<str name="fmap.div">ignored_</str>
-		</lst>
-	</requestHandler>
+        <useColdSearcher>false</useColdSearcher>
+
+        <maxWarmingSearchers>2</maxWarmingSearchers>
+
+    </query>
 
 
-	<requestHandler name="/analysis/field" startup="lazy"
-		class="solr.FieldAnalysisRequestHandler" />
+    <requestDispatcher handleSelect="false">
+        <requestParsers enableRemoteStreaming="true"
+                        multipartUploadLimitInKB="2048000"
+                        formdataUploadLimitInKB="2048"
+                        addHttpRequestToContext="false"/>
+
+        <httpCaching never304="true"/>
+
+    </requestDispatcher>
+
+    <!-- 增加xml 数据导入 -->
+    <requestHandler name="/dataimport"
+                    class="org.apache.solr.handler.dataimport.DataImportHandler">
+        <lst name="defaults">
+            <str name="config">xml-data-config.xml</str>
+        </lst>
+    </requestHandler>
+
+    <requestHandler name="/browse" class="solr.SearchHandler">
+        <lst name="defaults">
+            <str name="echoParams">explicit</str>
+
+            <!-- VelocityResponseWriter settings -->
+            <str name="wt">velocity</str>
+            <str name="v.properties">velocity.properties</str>
+            <str name="v.contentType">text/html;charset=utf-8</str>
+
+            <str name="v.template">browse</str>
+            <str name="v.layout">layout</str>
+            <str name="title">团购网站demo</str>
+
+            <!-- Query settings -->
+            <str name="defType">edismax</str>
+            <str name="df">text</str>
+            <str name="mm">100%</str>
+            <str name="q.alt">*:*</str>
+            <str name="rows">32</str>
+            <str name="fl">*,score</str>
 
 
-	<requestHandler name="/analysis/document"
-		class="solr.DocumentAnalysisRequestHandler" startup="lazy" />
+            <!-- Faceting defaults -->
+            <str name="facet">on</str>
+            <str name="facet.field">city</str>
+            <str name="facet.field">sort</str>
+            <str name="facet.range">price</str>
+            <int name="f.price.facet.range.start">100</int>
+            <int name="f.price.facet.range.end">1500</int>
+            <int name="f.price.facet.range.gap">200</int>
 
-	<requestHandler name="/admin/" class="solr.admin.AdminHandlers" />
-	<requestHandler name="/admin/luke" class="solr.admin.LukeRequestHandler" />
-	<requestHandler name="/admin/system" class="solr.admin.SystemInfoHandler" />
-	<requestHandler name="/admin/plugins" class="solr.admin.PluginInfoHandler" />
-	<requestHandler name="/admin/threads" class="solr.admin.ThreadDumpHandler" />
-	<requestHandler name="/admin/properties"
-		class="solr.admin.PropertiesRequestHandler" />
-	<requestHandler name="/admin/file" class="solr.admin.ShowFileRequestHandler">
-	</requestHandler>
+            <!-- Highlighting defaults -->
+            <str name="hl">on</str>
+            <str name="hl.fl">title</str>
+            <str name="hl.encoder">html</str>
+            <str name="hl.simple.pre">&lt;font colr='red' &gt;</str>
+            <str name="hl.simple.post">&lt;/font&gt;</str>
+            <str name="f.title.hl.fragsize">0</str>
+            <str name="f.title.hl.alternateField">title</str>
 
-	<!-- ping/healthcheck -->
-	<requestHandler name="/admin/ping" class="solr.PingRequestHandler">
-		<lst name="invariants">
-			<str name="q">solrpingquery</str>
-		</lst>
-		<lst name="defaults">
-			<str name="echoParams">all</str>
-		</lst>
-	</requestHandler>
+            <!-- Spell checking defaults -->
+            <str name="spellcheck">on</str>
+            <str name="spellcheck.extendedResults">false</str>
+            <str name="spellcheck.count">5</str>
+            <str name="spellcheck.alternativeTermCount">2</str>
+            <str name="spellcheck.maxResultsForSuggest">5</str>
+            <str name="spellcheck.collate">true</str>
+            <str name="spellcheck.collateExtendedResults">true</str>
+            <str name="spellcheck.maxCollationTries">5</str>
+            <str name="spellcheck.maxCollations">3</str>
+        </lst>
 
-	<!-- Echo the request contents back to the client -->
-	<requestHandler name="/debug/dump" class="solr.DumpRequestHandler">
-		<lst name="defaults">
-			<str name="echoParams">explicit</str>
-			<str name="echoHandler">true</str>
-		</lst>
-	</requestHandler>
-
-	<requestHandler name="/replication" class="solr.ReplicationHandler">
-	</requestHandler>
-
-	<searchComponent name="spellcheck" class="solr.SpellCheckComponent">
-		<str name="queryAnalyzerFieldType">text_general</str>
-		<lst name="spellchecker">
-			<str name="name">default</str>
-			<str name="field">text</str>
-			<str name="classname">solr.DirectSolrSpellChecker</str>
-			<!-- the spellcheck distance measure used, the default is the internal 
-				levenshtein -->
-			<str name="distanceMeasure">internal</str>
-			<!-- minimum accuracy needed to be considered a valid spellcheck suggestion -->
-			<float name="accuracy">0.5</float>
-			<!-- the maximum #edits we consider when enumerating terms: can be 1 or 
-				2 -->
-			<int name="maxEdits">2</int>
-			<!-- the minimum shared prefix when enumerating terms -->
-			<int name="minPrefix">1</int>
-			<!-- maximum number of inspections per result. -->
-			<int name="maxInspections">5</int>
-			<!-- minimum length of a query term to be considered for correction -->
-			<int name="minQueryLength">4</int>
-			<!-- maximum threshold of documents a query term can appear to be considered 
-				for correction -->
-			<float name="maxQueryFrequency">0.01</float>
-			<!-- uncomment this to require suggestions to occur in 1% of the documents 
-				<float name="thresholdTokenFrequency">.01</float> -->
-		</lst>
-
-		<!-- a spellchecker that can break or combine words. See "/spell" handler 
-			below for usage -->
-		<lst name="spellchecker">
-			<str name="name">wordbreak</str>
-			<str name="classname">solr.WordBreakSolrSpellChecker</str>
-			<str name="field">name</str>
-			<str name="combineWords">true</str>
-			<str name="breakWords">true</str>
-			<int name="maxChanges">10</int>
-		</lst>
-
-	</searchComponent>
-
-	<requestHandler name="/spell" class="solr.SearchHandler"
-		startup="lazy">
-		<lst name="defaults">
-			<str name="df">text</str>
-			<!-- Solr will use suggestions from both the 'default' spellchecker and 
-				from the 'wordbreak' spellchecker and combine them. collations (re-written 
-				queries) can include a combination of corrections from both spellcheckers -->
-			<str name="spellcheck.dictionary">default</str>
-			<str name="spellcheck.dictionary">wordbreak</str>
-			<str name="spellcheck">on</str>
-			<str name="spellcheck.extendedResults">true</str>
-			<str name="spellcheck.count">10</str>
-			<str name="spellcheck.alternativeTermCount">5</str>
-			<str name="spellcheck.maxResultsForSuggest">5</str>
-			<str name="spellcheck.collate">true</str>
-			<str name="spellcheck.collateExtendedResults">true</str>
-			<str name="spellcheck.maxCollationTries">10</str>
-			<str name="spellcheck.maxCollations">5</str>
-		</lst>
-		<arr name="last-components">
-			<str>spellcheck</str>
-		</arr>
-	</requestHandler>
-
-	<searchComponent name="tvComponent" class="solr.TermVectorComponent" />
-
-	<requestHandler name="/tvrh" class="solr.SearchHandler"
-		startup="lazy">
-		<lst name="defaults">
-			<str name="df">text</str>
-			<bool name="tv">true</bool>
-		</lst>
-		<arr name="last-components">
-			<str>tvComponent</str>
-		</arr>
-	</requestHandler>
-
-	<searchComponent name="clustering"
-		enable="${solr.clustering.enabled:false}" class="solr.clustering.ClusteringComponent">
-		<!-- Declare an engine -->
-		<lst name="engine">
-			<!-- The name, only one can be named "default" -->
-			<str name="name">default</str>
-
-			<str name="carrot.algorithm">org.carrot2.clustering.lingo.LingoClusteringAlgorithm
-			</str>
-
-			<str name="LingoClusteringAlgorithm.desiredClusterCountBase">20</str>
-
-			<str name="carrot.lexicalResourcesDir">clustering/carrot2</str>
-
-			<str name="MultilingualClustering.defaultLanguage">ENGLISH</str>
-		</lst>
-		<lst name="engine">
-			<str name="name">stc</str>
-			<str name="carrot.algorithm">org.carrot2.clustering.stc.STCClusteringAlgorithm
-			</str>
-		</lst>
-	</searchComponent>
-
-	<requestHandler name="/clustering" startup="lazy"
-		enable="${solr.clustering.enabled:false}" class="solr.SearchHandler">
-		<lst name="defaults">
-			<bool name="clustering">true</bool>
-			<str name="clustering.engine">default</str>
-			<bool name="clustering.results">true</bool>
-			<!-- The title field -->
-			<str name="carrot.title">name</str>
-			<str name="carrot.url">id</str>
-			<!-- The field to cluster on -->
-			<str name="carrot.snippet">features</str>
-			<!-- produce summaries -->
-			<bool name="carrot.produceSummary">true</bool>
-			<!-- the maximum number of labels per cluster -->
-			<!--<int name="carrot.numDescriptions">5</int> -->
-			<!-- produce sub clusters -->
-			<bool name="carrot.outputSubClusters">false</bool>
-
-			<str name="defType">edismax</str>
-			<str name="qf">
-				text^0.5 features^1.0 name^1.2 sku^1.5 id^10.0 manu^1.1
-				cat^1.4
-			</str>
-			<str name="q.alt">*:*</str>
-			<str name="rows">10</str>
-			<str name="fl">*,score</str>
-		</lst>
-		<arr name="last-components">
-			<str>clustering</str>
-		</arr>
-	</requestHandler>
-
-	<searchComponent name="terms" class="solr.TermsComponent" />
-
-	<requestHandler name="/terms" class="solr.SearchHandler"
-		startup="lazy">
-		<lst name="defaults">
-			<bool name="terms">true</bool>
-			<bool name="distrib">false</bool>
-		</lst>
-		<arr name="components">
-			<str>terms</str>
-		</arr>
-	</requestHandler>
+        <!-- append spellchecking to our list of components -->
+        <arr name="last-components">
+            <str>spellcheck</str>
+        </arr>
+    </requestHandler>
 
 
-	<searchComponent name="elevator" class="solr.QueryElevationComponent">
-		<!-- pick a fieldType to analyze queries -->
-		<str name="queryFieldType">string</str>
-		<str name="config-file">elevate.xml</str>
-	</searchComponent>
+    <requestHandler name="/select" class="solr.SearchHandler">
+        <lst name="defaults">
+            <str name="echoParams">explicit</str>
+            <int name="rows">10</int>
+            <str name="df">text</str>
+        </lst>
+    </requestHandler>
 
-	<requestHandler name="/elevate" class="solr.SearchHandler"
-		startup="lazy">
-		<lst name="defaults">
-			<str name="echoParams">explicit</str>
-			<str name="df">text</str>
-		</lst>
-		<arr name="last-components">
-			<str>elevator</str>
-		</arr>
-	</requestHandler>
+    <!-- A request handler that returns indented JSON by default -->
+    <requestHandler name="/query" class="solr.SearchHandler">
+        <lst name="defaults">
+            <str name="echoParams">explicit</str>
+            <str name="wt">json</str>
+            <str name="indent">true</str>
+            <str name="df">text</str>
+        </lst>
+    </requestHandler>
 
-	<searchComponent class="solr.HighlightComponent" name="highlight">
-		<highlighting>
-			<!-- Configure the standard fragmenter -->
-			<!-- This could most likely be commented out in the "default" case -->
-			<fragmenter name="gap" default="true"
-				class="solr.highlight.GapFragmenter">
-				<lst name="defaults">
-					<int name="hl.fragsize">100</int>
-				</lst>
-			</fragmenter>
 
-			<!-- A regular-expression-based fragmenter (for sentence extraction) -->
-			<fragmenter name="regex" class="solr.highlight.RegexFragmenter">
-				<lst name="defaults">
-					<!-- slightly smaller fragsizes work better because of slop -->
-					<int name="hl.fragsize">70</int>
-					<!-- allow 50% slop on fragment sizes -->
-					<float name="hl.regex.slop">0.5</float>
-					<!-- a basic sentence pattern -->
-					<str name="hl.regex.pattern">[-\w ,/\n\&quot;&apos;]{20,200}</str>
-				</lst>
-			</fragmenter>
+    <requestHandler name="/get" class="solr.RealTimeGetHandler">
+        <lst name="defaults">
+            <str name="omitHeader">true</str>
+            <str name="wt">json</str>
+            <str name="indent">true</str>
+        </lst>
+    </requestHandler>
 
-			<!-- Configure the standard formatter -->
-			<formatter name="html" default="true"
-				class="solr.highlight.HtmlFormatter">
-				<lst name="defaults">
-					<str name="hl.simple.pre"><![CDATA[<em>]]></str>
-					<str name="hl.simple.post"><![CDATA[</em>]]></str>
-				</lst>
-			</formatter>
+    <requestHandler name="/export" class="solr.SearchHandler">
+        <lst name="invariants">
+            <str name="rq">{!xport}</str>
+            <str name="wt">xsort</str>
+            <str name="distrib">false</str>
+        </lst>
 
-			<!-- Configure the standard encoder -->
-			<encoder name="html" class="solr.highlight.HtmlEncoder" />
+        <arr name="components">
+            <str>query</str>
+        </arr>
+    </requestHandler>
 
-			<!-- Configure the standard fragListBuilder -->
-			<fragListBuilder name="simple"
-				class="solr.highlight.SimpleFragListBuilder" />
 
-			<!-- Configure the single fragListBuilder -->
-			<fragListBuilder name="single"
-				class="solr.highlight.SingleFragListBuilder" />
+    <requestHandler name="/update" class="solr.UpdateRequestHandler">
 
-			<!-- Configure the weighted fragListBuilder -->
-			<fragListBuilder name="weighted" default="true"
-				class="solr.highlight.WeightedFragListBuilder" />
+    </requestHandler>
 
-			<!-- default tag FragmentsBuilder -->
-			<fragmentsBuilder name="default" default="true"
-				class="solr.highlight.ScoreOrderFragmentsBuilder">
-				<!-- <lst name="defaults"> <str name="hl.multiValuedSeparatorChar">/</str> 
-					</lst> -->
-			</fragmentsBuilder>
 
-			<!-- multi-colored tag FragmentsBuilder -->
-			<fragmentsBuilder name="colored"
-				class="solr.highlight.ScoreOrderFragmentsBuilder">
-				<lst name="defaults">
-					<str name="hl.tag.pre"><![CDATA[
+    <requestHandler name="/update/extract"
+                    startup="lazy"
+                    class="solr.extraction.ExtractingRequestHandler">
+        <lst name="defaults">
+            <str name="lowernames">true</str>
+            <str name="uprefix">ignored_</str>
+
+            <!-- capture link hrefs but ignore div attributes -->
+            <str name="captureAttr">true</str>
+            <str name="fmap.a">links</str>
+            <str name="fmap.div">ignored_</str>
+        </lst>
+    </requestHandler>
+
+
+    <requestHandler name="/analysis/field"
+                    startup="lazy"
+                    class="solr.FieldAnalysisRequestHandler"/>
+
+
+    <requestHandler name="/analysis/document"
+                    class="solr.DocumentAnalysisRequestHandler"
+                    startup="lazy"/>
+
+
+    <requestHandler name="/admin/"
+                    class="solr.admin.AdminHandlers"/>
+
+    <!-- ping/healthcheck -->
+    <requestHandler name="/admin/ping" class="solr.PingRequestHandler">
+        <lst name="invariants">
+            <str name="q">solrpingquery</str>
+        </lst>
+        <lst name="defaults">
+            <str name="echoParams">all</str>
+        </lst>
+    </requestHandler>
+
+    <!-- Echo the request contents back to the client -->
+    <requestHandler name="/debug/dump" class="solr.DumpRequestHandler">
+        <lst name="defaults">
+            <str name="echoParams">explicit</str>
+            <str name="echoHandler">true</str>
+        </lst>
+    </requestHandler>
+
+
+    <requestHandler name="/replication" class="solr.ReplicationHandler">
+
+    </requestHandler>
+
+
+    <searchComponent name="spellcheck" class="solr.SpellCheckComponent">
+
+        <str name="queryAnalyzerFieldType">text_general</str>
+        <!-- a spellchecker built from a field of the main index -->
+        <lst name="spellchecker">
+            <str name="name">default</str>
+            <str name="field">text</str>
+            <str name="classname">solr.DirectSolrSpellChecker</str>
+            <!-- the spellcheck distance measure used, the default is the internal levenshtein -->
+            <str name="distanceMeasure">internal</str>
+            <!-- minimum accuracy needed to be considered a valid spellcheck suggestion -->
+            <float name="accuracy">0.5</float>
+            <!-- the maximum #edits we consider when enumerating terms: can be 1 or 2 -->
+            <int name="maxEdits">2</int>
+            <!-- the minimum shared prefix when enumerating terms -->
+            <int name="minPrefix">1</int>
+            <!-- maximum number of inspections per result. -->
+            <int name="maxInspections">5</int>
+            <!-- minimum length of a query term to be considered for correction -->
+            <int name="minQueryLength">4</int>
+            <!-- maximum threshold of documents a query term can appear to be considered for correction -->
+            <float name="maxQueryFrequency">0.01</float>
+            <!-- uncomment this to require suggestions to occur in 1% of the documents
+                <float name="thresholdTokenFrequency">.01</float>
+            -->
+        </lst>
+
+        <!-- a spellchecker that can break or combine words.  See "/spell" handler below for usage -->
+        <lst name="spellchecker">
+            <str name="name">wordbreak</str>
+            <str name="classname">solr.WordBreakSolrSpellChecker</str>
+            <str name="field">name</str>
+            <str name="combineWords">true</str>
+            <str name="breakWords">true</str>
+            <int name="maxChanges">10</int>
+        </lst>
+
+    </searchComponent>
+
+    <requestHandler name="/spell" class="solr.SearchHandler" startup="lazy">
+        <lst name="defaults">
+            <str name="df">text</str>
+            <str name="spellcheck.dictionary">default</str>
+            <str name="spellcheck.dictionary">wordbreak</str>
+            <str name="spellcheck">on</str>
+            <str name="spellcheck.extendedResults">true</str>
+            <str name="spellcheck.count">10</str>
+            <str name="spellcheck.alternativeTermCount">5</str>
+            <str name="spellcheck.maxResultsForSuggest">5</str>
+            <str name="spellcheck.collate">true</str>
+            <str name="spellcheck.collateExtendedResults">true</str>
+            <str name="spellcheck.maxCollationTries">10</str>
+            <str name="spellcheck.maxCollations">5</str>
+        </lst>
+        <arr name="last-components">
+            <str>spellcheck</str>
+        </arr>
+    </requestHandler>
+
+    <searchComponent name="suggest" class="solr.SuggestComponent">
+        <lst name="suggester">
+            <str name="name">mySuggester</str>
+            <str name="lookupImpl">FuzzyLookupFactory</str>
+            <!-- org.apache.solr.spelling.suggest.fst -->
+            <str name="dictionaryImpl">DocumentDictionaryFactory</str>
+            <!-- org.apache.solr.spelling.suggest.HighFrequencyDictionaryFactory -->
+            <str name="field">cat</str>
+            <str name="weightField">price</str>
+            <str name="suggestAnalyzerFieldType">string</str>
+        </lst>
+    </searchComponent>
+
+    <requestHandler name="/suggest" class="solr.SearchHandler" startup="lazy">
+        <lst name="defaults">
+            <str name="suggest">true</str>
+            <str name="suggest.count">10</str>
+        </lst>
+        <arr name="components">
+            <str>suggest</str>
+        </arr>
+    </requestHandler>
+
+
+    <searchComponent name="terms" class="solr.TermsComponent"/>
+
+    <!-- A request handler for demonstrating the terms component -->
+    <requestHandler name="/terms" class="solr.SearchHandler" startup="lazy">
+        <lst name="defaults">
+            <bool name="terms">true</bool>
+            <bool name="distrib">false</bool>
+        </lst>
+        <arr name="components">
+            <str>terms</str>
+        </arr>
+    </requestHandler>
+
+
+    <searchComponent class="solr.HighlightComponent" name="highlight">
+        <highlighting>
+            <!-- Configure the standard fragmenter -->
+            <!-- This could most likely be commented out in the "default" case -->
+            <fragmenter name="gap"
+                        default="true"
+                        class="solr.highlight.GapFragmenter">
+                <lst name="defaults">
+                    <int name="hl.fragsize">100</int>
+                </lst>
+            </fragmenter>
+
+            <fragmenter name="regex"
+                        class="solr.highlight.RegexFragmenter">
+                <lst name="defaults">
+                    <!-- slightly smaller fragsizes work better because of slop -->
+                    <int name="hl.fragsize">70</int>
+                    <!-- allow 50% slop on fragment sizes -->
+                    <float name="hl.regex.slop">0.5</float>
+                    <!-- a basic sentence pattern -->
+                    <str name="hl.regex.pattern">[-\w ,/\n\&quot;&apos;]{20,200}</str>
+                </lst>
+            </fragmenter>
+            <formatter name="html"
+                       default="true"
+                       class="solr.highlight.HtmlFormatter">
+                <lst name="defaults">
+                    <str name="hl.simple.pre"><![CDATA[<em>]]></str>
+                    <str name="hl.simple.post"><![CDATA[</em>]]></str>
+                </lst>
+            </formatter>
+            <encoder name="html"
+                     class="solr.highlight.HtmlEncoder"/>
+            <fragListBuilder name="simple"
+                             class="solr.highlight.SimpleFragListBuilder"/>
+            <fragListBuilder name="single"
+                             class="solr.highlight.SingleFragListBuilder"/>
+            <fragListBuilder name="weighted"
+                             default="true"
+                             class="solr.highlight.WeightedFragListBuilder"/>
+            <fragmentsBuilder name="default"
+                              default="true"
+                              class="solr.highlight.ScoreOrderFragmentsBuilder">
+            </fragmentsBuilder>
+
+            <!-- multi-colored tag FragmentsBuilder -->
+            <fragmentsBuilder name="colored"
+                              class="solr.highlight.ScoreOrderFragmentsBuilder">
+                <lst name="defaults">
+                    <str name="hl.tag.pre"><![CDATA[
                <b style="background:yellow">,<b style="background:lawgreen">,
                <b style="background:aquamarine">,<b style="background:magenta">,
                <b style="background:palegreen">,<b style="background:coral">,
                <b style="background:wheat">,<b style="background:khaki">,
                <b style="background:lime">,<b style="background:deepskyblue">]]></str>
-					<str name="hl.tag.post"><![CDATA[</b>]]></str>
-				</lst>
-			</fragmentsBuilder>
+                    <str name="hl.tag.post"><![CDATA[</b>]]></str>
+                </lst>
+            </fragmentsBuilder>
 
-			<boundaryScanner name="default" default="true"
-				class="solr.highlight.SimpleBoundaryScanner">
-				<lst name="defaults">
-					<str name="hl.bs.maxScan">10</str>
-					<str name="hl.bs.chars">.,!? &#9;&#10;&#13;</str>
-				</lst>
-			</boundaryScanner>
+            <boundaryScanner name="default"
+                             default="true"
+                             class="solr.highlight.SimpleBoundaryScanner">
+                <lst name="defaults">
+                    <str name="hl.bs.maxScan">10</str>
+                    <str name="hl.bs.chars">.,!? &#9;&#10;&#13;</str>
+                </lst>
+            </boundaryScanner>
 
-			<boundaryScanner name="breakIterator"
-				class="solr.highlight.BreakIteratorBoundaryScanner">
-				<lst name="defaults">
-					<!-- type should be one of CHARACTER, WORD(default), LINE and SENTENCE -->
-					<str name="hl.bs.type">WORD</str>
-					<!-- language and country are used when constructing Locale object. -->
-					<!-- And the Locale object will be used when getting instance of BreakIterator -->
-					<str name="hl.bs.language">en</str>
-					<str name="hl.bs.country">US</str>
-				</lst>
-			</boundaryScanner>
-		</highlighting>
-	</searchComponent>
-
-
-	<queryResponseWriter name="json" class="solr.JSONResponseWriter">
-		<!-- For the purposes of the tutorial, JSON responses are written as plain 
-			text so that they are easy to read in *any* browser. If you expect a MIME 
-			type of "application/json" just remove this override. -->
-		<str name="content-type">text/plain; charset=UTF-8</str>
-	</queryResponseWriter>
-
-	<!-- Custom response writers can be declared as needed... -->
-	<queryResponseWriter name="velocity"
-		class="solr.VelocityResponseWriter" startup="lazy" />
+            <boundaryScanner name="breakIterator"
+                             class="solr.highlight.BreakIteratorBoundaryScanner">
+                <lst name="defaults">
+                    <!-- type should be one of CHARACTER, WORD(default), LINE and SENTENCE -->
+                    <str name="hl.bs.type">WORD</str>
+                    <!-- language and country are used when constructing Locale object.  -->
+                    <!-- And the Locale object will be used when getting instance of BreakIterator -->
+                    <str name="hl.bs.language">en</str>
+                    <str name="hl.bs.country">US</str>
+                </lst>
+            </boundaryScanner>
+        </highlighting>
+    </searchComponent>
 
 
-	<queryResponseWriter name="xslt" class="solr.XSLTResponseWriter">
-		<int name="xsltCacheLifetimeSeconds">5</int>
-	</queryResponseWriter>
+    <queryResponseWriter name="json" class="solr.JSONResponseWriter">
+        <str name="content-type">text/plain; charset=UTF-8</str>
+    </queryResponseWriter>
 
-	<admin>
-		<defaultQuery>*:*</defaultQuery>
-	</admin>
+
+    <queryResponseWriter name="velocity" class="solr.VelocityResponseWriter" startup="lazy"/>
+
+
+    <queryResponseWriter name="xslt" class="solr.XSLTResponseWriter">
+        <int name="xsltCacheLifetimeSeconds">5</int>
+    </queryResponseWriter>
+
+
+    <admin>
+        <defaultQuery>*:*</defaultQuery>
+    </admin>
 
 </config>

@@ -1,3 +1,8 @@
+#**
+ *  Global macros used by other templates.
+ *  This file must be named VM_global_library.vm
+ *  in order for Velocity to find it.
+ *#
 
 #macro(param $key)$request.params.get($key)#end
 
@@ -41,7 +46,7 @@
 #macro(url_for_nested_facet_query $field)#url_for_home#lens&fq=$esc.url($field)#end
 
 ## TODO: convert to use {!raw f=$field}$value (with escaping of course)
-#macro(url_for_facet_filter $field $value)#url_for_home#lens&fq=$esc.url($field):%22$esc.url($value)%22#end
+#macro(url_for_facet_filter $field $value)#url_for_home#lens&fq=#if($value!=$null)$esc.url($field):%22$esc.url($value)%22#else-$esc.url($field):[*+TO+*]#end#end
 
 #macro(url_for_facet_date_filter $field $value)#url_for_home#lens&fq=$esc.url($field):$esc.url($value)#end
 
@@ -51,14 +56,14 @@
 #macro(link_to_previous_page $text)
   #if($page.current_page_number > 1)
     #set($prev_start = $page.start - $page.results_per_page)
-    <a class="prev" href="#url_for_start($prev_start)">$text</a>
+    <a class="prev-page" href="#url_for_start($prev_start)">$text</a>
   #end
 #end
 
 #macro(link_to_next_page $text)
   #if($page.current_page_number < $page.page_count)
     #set($next_start = $page.start + $page.results_per_page)
-    <a class="next" href="#url_for_start($next_start)">$text</a>
+    <a class="next-page" href="#url_for_start($next_start)">$text</a>
   #end
 #end
 
@@ -76,7 +81,7 @@
 #macro(display_facet_query $field, $display, $fieldName)
   #if($field.size() > 0)
   <span class="facet-field">$display</span>
-    <ul>
+    <ul style="list-style:none;">
     #foreach ($facet in $field)
       #if ($facet.value > 0)
         #set($facetURL = "#url_for_nested_facet_query($facet.key)")
@@ -89,38 +94,29 @@
   #end      
 #end
 
-
+############修改 face 样式。
 #macro(display_facet_range $field, $display, $fieldName, $start, $end, $gap, $before, $after)
-  	<dl><dt>$display： <dt>
-  	<dd>
+  <span class="facet-field">$display</span>
+    <ul style="list-style:none;ss">
     #if($before && $before != "")
       #set($value = "[* TO " + "#format_value($start)" + "}")
       #set($facetURL = "#url_for_facet_range_filter($fieldName, $value)")
-      
-      <div rel="0">
-		<a href="$facetURL">Less than #format_value($start)</a>($before)
-	  </div>
+      <li><a href="$facetURL">Less than #format_value($start)</a> ($before)</li>
     #end
     #foreach ($facet in $field)
       #set($rangeEnd = "#range_get_to_value($facet.key, $gap)")
       #set($value = "[" + $facet.key + " TO " + $rangeEnd + "}")
       #set($facetURL = "#url_for_facet_range_filter($fieldName, $value)")
       #if ($facetURL != '')
-      
-      	<div rel="0">
-			<a href="$facetURL">$facet.key - #format_value($rangeEnd)</a>($facet.value)
-		</div>
+        <li><a href="$facetURL">$facet.key - #format_value($rangeEnd)</a> ($facet.value)</li>
       #end
     #end
     #if($end && $end != "" && $after > 0)
       #set($value = "[" + "#format_value($end)" + " TO *}")
       #set($facetURL = "#url_for_facet_range_filter($fieldName, $value)")
-      
-      <div rel="0">
-			<a href="$facetURL">More than #format_value($end)</a>($after)
-		</div>
+      <li><a href="$facetURL">More than #format_value($end)</a> ($after)</li>
     #end
-    </dd></dl>
+    </ul>
 #end
 
 ## $pivots is a list of facet_pivot
@@ -130,10 +126,17 @@
     <ul>
       #foreach ($pivot in $pivots)
         #foreach ($entry in $pivot.value)
-          <a href="#url_for_facet_filter($entry.field, $entry.value)">$entry.field::$entry.value</a> ($entry.count)
+          <a href="#url_for_facet_filter($entry.field, $entry.value)">$entry.field::#if($entry.value!=$null)$entry.value#else<em>missing</em>#end</a> ($entry.count)
           <ul>
             #foreach($nest in $entry.pivot)
-              <a href="#url_for_facet_filter($entry.field, $entry.value)&fq=$esc.url($nest.field):%22$esc.url($nest.value)%22">$nest.field::$nest.value</a> ($nest.count)
+              <li>
+                #if($nest.value != $null)
+                  <a href="#url_for_facet_filter($entry.field, $entry.value)&fq=$esc.url($nest.field):%22$esc.url($nest.value)%22">$nest.field::$nest.value</a>
+                #else
+                  <a href="#url_for_facet_filter($entry.field, $entry.value)&fq=-$esc.url($nest.field):[*+TO+*]">$nest.field::<em>missing</em></a>
+                #end
+                ($nest.count)
+              </li>
             #end
           </ul>
         #end
