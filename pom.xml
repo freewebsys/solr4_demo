@@ -7,7 +7,7 @@
 	<packaging>war</packaging>
 
 	<properties>
-		<solr.version>4.6.0</solr.version>
+		<solr.version>4.10.0</solr.version>
 	</properties>
 
 	<dependencies>
@@ -109,11 +109,11 @@
 					</scanTargetPatterns>
 					<connectors>
 						<connector implementation="org.mortbay.jetty.nio.SelectChannelConnector">
-							<port>8080</port>
+							<port>8081</port>
 						</connector>
 					</connectors>
 					<stopKey>exit</stopKey>
-					<stopPort>8081</stopPort>
+					<stopPort>8082</stopPort>
 				</configuration>
 			</plugin>
 		</plugins>
