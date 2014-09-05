@@ -109,11 +109,11 @@
 					</scanTargetPatterns>
 					<connectors>
 						<connector implementation="org.mortbay.jetty.nio.SelectChannelConnector">
-							<port>8081</port>
+							<port>80</port>
 						</connector>
 					</connectors>
 					<stopKey>exit</stopKey>
-					<stopPort>8082</stopPort>
+					<stopPort>8081</stopPort>
 				</configuration>
 			</plugin>
 		</plugins>
