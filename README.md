@@ -4,5 +4,5 @@
 - 项目本地可以直接使用maven jetty跑起
 - solr地址 http://lucene.apache.org/solr/
 
-- 博客地址：
+- 博客地址：  http://blog.csdn.net/freewebsys/article/details/39078269
 
